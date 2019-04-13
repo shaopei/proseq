@@ -762,10 +762,10 @@ if [[ ! -z "$PREMAP_BWAIDX" ]]; then
     if [[ ! -z "$aln" ]]; then
         for name in ${QC_INPUT}
         do
-            bwa aln -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_1.fastq.gz  >  ${TMPDIR}/${name}_aln_sa1.sai
-            bwa aln -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_2.fastq.gz  >  ${TMPDIR}/${name}_aln_sa2.sai
+            bwa aln -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_1.fastq.gz  >  ${TMPDIR}/${name}_aln_sa1.sai
+            bwa aln -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_2.fastq.gz  >  ${TMPDIR}/${name}_aln_sa2.sai
             bwa sampe -n 1 -f ${ToMapDir}/${name}_end.sam ${PREMAP_BWAIDX} ${TMPDIR}/${name}_aln_sa1.sai ${TMPDIR}/${name}_aln_sa2.sai ${ToMapDir}/${name}_1.fastq.gz ${ToMapDir}/${name}_2.fastq.gz
-            samtools view -bf 0x4 ${ToMapDir}/${name}_end.sam| samtools sort -n -@ ${thread} - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
+            samtools view -bf 0x4 ${ToMapDir}/${name}_end.sam| samtools sort -n -@ 1 - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
             rm ${TMPDIR}/${name}_aln_sa1.sai ${TMPDIR}/${name}_aln_sa2.sai ${ToMapDir}/${name}_end.sam
             bamToFastq -i ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam -fq ${TMPDIR}/Unmapped_to_premap/${name}_1.fastq -fq2 ${TMPDIR}/Unmapped_to_premap/${name}_2.fastq 
             gzip ${TMPDIR}/Unmapped_to_premap/${name}_1.fastq ${TMPDIR}/Unmapped_to_premap/${name}_2.fastq 
@@ -774,8 +774,8 @@ if [[ ! -z "$PREMAP_BWAIDX" ]]; then
     else #defaul use mem
       for name in ${QC_INPUT}
         do
-        bwa mem -k 19 -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_1.fastq.gz ${ToMapDir}/${name}_2.fastq.gz |\
-        samtools view -bf 0x4 | samtools sort -n -@ ${thread} - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
+        bwa mem -k 19 -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_1.fastq.gz ${ToMapDir}/${name}_2.fastq.gz |\
+        samtools view -bf 0x4 | samtools sort -n -@ 1 - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
         bamToFastq -i ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam -fq ${TMPDIR}/Unmapped_to_premap/${name}_1.fastq -fq2 ${TMPDIR}/Unmapped_to_premap/${name}_2.fastq 
         gzip ${TMPDIR}/Unmapped_to_premap/${name}_1.fastq ${TMPDIR}/Unmapped_to_premap/${name}_2.fastq 
         #rm ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
@@ -1034,8 +1034,8 @@ if [[ ! -z "$PREMAP_BWAIDX" ]]; then
    if [[ ! -z "$mem" ]]; then
       for name in ${QC_INPUT}
         do
-        bwa mem -k 19 -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz |\
-        samtools view -bf 0x4 | samtools sort -n -@ ${thread} - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
+        bwa mem -k 19 -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz |\
+        samtools view -bf 0x4 | samtools sort -n -@ 1 - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
         bamToFastq -i ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam -fq ${TMPDIR}/Unmapped_to_premap/${name}_end.fastq.gz 
         gzip ${TMPDIR}/Unmapped_to_premap/${name}_end.fastq.gz
         #rm ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
@@ -1043,12 +1043,12 @@ if [[ ! -z "$PREMAP_BWAIDX" ]]; then
     else # default use aln
         for name in ${QC_INPUT}
         do
-        echo "    bwa aln -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz  | \
+        echo "    bwa aln -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz  | \
             bwa samse -n 1 -f ${ToMapDir}/${name}_end.sam ${PREMAP_BWAIDX} - ${ToMapDir}/${name}_end.fastq.gz"
 
-            bwa aln -t ${thread} ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz  | \
+            bwa aln -t 1 ${PREMAP_BWAIDX} ${ToMapDir}/${name}_end.fastq.gz  | \
             bwa samse -n 1 -f ${ToMapDir}/${name}_end.sam ${PREMAP_BWAIDX} - ${ToMapDir}/${name}_end.fastq.gz
-            samtools view -bf 0x4 ${ToMapDir}/${name}_end.sam| samtools sort -n -@ ${thread} - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
+            samtools view -bf 0x4 ${ToMapDir}/${name}_end.sam| samtools sort -n -@ 1 - > ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam
             #rm ${ToMapDir}/${name}_end.sam
             bamToFastq -i ${TMPDIR}/Unmapped_to_premap/${name}_unmapped.bam -fq ${TMPDIR}/Unmapped_to_premap/${name}_end.fastq 
             gzip ${TMPDIR}/Unmapped_to_premap/${name}_end.fastq
